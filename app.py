@@ -39,6 +39,12 @@ def main():
     db = Database(settings.db_path)
     async def post_init(application):
         start_scheduler(application, db, model)
+        from telegram import BotCommand
+        await application.bot.set_my_commands([
+            BotCommand("add", "Thêm vị thế mới"),
+            BotCommand("list", "Xem danh mục đang theo dõi"),
+            BotCommand("menu", "Hiện menu chính"),
+        ])
         
     app = Application.builder().token(settings.telegram_bot_token).post_init(post_init).build()
     register_handlers(app, db)
