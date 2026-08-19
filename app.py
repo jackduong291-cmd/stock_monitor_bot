@@ -89,8 +89,10 @@ async def main():
         
         # RENDER_EXTERNAL_URL is provided by Render, e.g., https://stock-monitor.onrender.com
         webapp_url = os.environ.get('RENDER_EXTERNAL_URL', 'https://example.com')
+        application.bot_data['webapp_url'] = webapp_url
         
         await application.bot.set_my_commands([
+            BotCommand("add", "Mở bảng Thêm vị thế"),
             BotCommand("list", "Xem danh mục đang theo dõi")
         ])
         
