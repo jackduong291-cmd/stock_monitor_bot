@@ -37,9 +37,11 @@ def main():
         model = None
 
     db = Database(settings.db_path)
-    app = Application.builder().token(settings.telegram_bot_token).build()
+    async def post_init(application):
+        start_scheduler(application, db, model)
+        
+    app = Application.builder().token(settings.telegram_bot_token).post_init(post_init).build()
     register_handlers(app, db)
-    start_scheduler(app, db, model)
     print('Stock Monitor Bot started')
 
     # Start dummy web server in a background thread for Render
