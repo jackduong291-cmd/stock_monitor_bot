@@ -88,7 +88,7 @@ async def main():
         from telegram import BotCommand, MenuButtonWebApp, WebAppInfo
         
         # RENDER_EXTERNAL_URL is provided by Render, e.g., https://stock-monitor.onrender.com
-        webapp_url = os.environ.get('RENDER_EXTERNAL_URL', 'https://example.com')
+        webapp_url = os.environ.get('RENDER_EXTERNAL_URL', 'https://stock-monitor-bot-g9rm.onrender.com')
         application.bot_data['webapp_url'] = webapp_url
         
         await application.bot.set_my_commands([

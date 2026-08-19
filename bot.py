@@ -12,7 +12,7 @@ def register_handlers(app, db):
     app.add_handler(CallbackQueryHandler(callback, pattern=r'^(list|follow|pause|close):?\d*$'))
 
 async def start(update, context):
-    webapp_url = context.application.bot_data.get('webapp_url', 'https://example.com')
+    webapp_url = context.application.bot_data.get('webapp_url', 'https://stock-monitor-bot-g9rm.onrender.com')
     from telegram import WebAppInfo
     kb = [[InlineKeyboardButton('📝 Mở Bảng Điền Thông Tin', web_app=WebAppInfo(url=webapp_url))]]
     await update.message.reply_text(
@@ -22,7 +22,7 @@ async def start(update, context):
     )
 
 async def add_position_menu(update, context):
-    webapp_url = context.application.bot_data.get('webapp_url', 'https://example.com')
+    webapp_url = context.application.bot_data.get('webapp_url', 'https://stock-monitor-bot-g9rm.onrender.com')
     from telegram import WebAppInfo
     kb = [[InlineKeyboardButton('📝 Mở Bảng Điền Thông Tin', web_app=WebAppInfo(url=webapp_url))]]
     await update.message.reply_text(
