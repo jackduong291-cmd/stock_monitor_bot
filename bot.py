@@ -48,7 +48,8 @@ async def test_report(update, context):
     engine = MonitorEngine(db, ai_model=ai_model)
     try:
         report = await engine.build_report(p, 'intraday')
-        debug_msg = f"Debug: Key length = {key_len}, Model loaded = {ai_model is not None}\n\n"
+        keys = list(context.application.bot_data.keys())
+        debug_msg = f"Debug: Key length = {key_len}, Model loaded = {ai_model is not None}, Keys = {keys}\n\n"
         await update.message.reply_text(debug_msg + report, parse_mode='HTML')
     except Exception as e:
         await update.message.reply_text(f"⚠️ Lỗi: {str(e)}")
