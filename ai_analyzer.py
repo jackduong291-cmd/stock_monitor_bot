@@ -20,8 +20,8 @@ async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, re
         'report_type': report_type
     }
     
-    prompt = f'''Bạn là chuyên gia chứng khoán VN. Nhiệm vụ của bạn là sử dụng công cụ Google Search để lấy tin tức mới nhất hôm nay về cổ phiếu {position.symbol} và tình hình vĩ mô, đặc biệt chú ý dòng tiền (như lệnh lớn mua/bán, khối ngoại).
-Sau khi quét tin tức, hãy thực hiện phân tích:
+    prompt = f'''Bạn là chuyên gia chứng khoán VN. Nhiệm vụ của bạn là sử dụng công cụ Google Search để lấy tin tức mới nhất hôm nay về cổ phiếu {position.symbol} và tình hình vĩ mô, đặc biệt chú ý dòng tiền.
+Sau khi quét tin tức, hãy thực hiện phân tích (LƯU Ý: Rất ngắn gọn, súc tích, ĐÁP ÁN DƯỚI 500 TỪ):
 '''
     if report_type == 'intraday':
         prompt += '''

@@ -14,6 +14,8 @@ class MonitorEngine:
         pnl = (snapshot.last_price - position.entry_price) * position.quantity
         roi = (snapshot.last_price / position.entry_price - 1) * 100 if position.entry_price > 0 else 0
         ai_analysis = await analyze(position, snapshot, market_ctx, report_type)
+        if len(ai_analysis) > 3500:
+            ai_analysis = ai_analysis[:3500] + '... (Cắt bớt do quá dài)'
 
         return self.format_report(position, snapshot, pnl, roi, ai_analysis, report_type)
 
