@@ -42,9 +42,20 @@ async def test_report(update, context):
         return
         
     p = rows[0] # Test the first one
-    from engine import MonitorEngine
     from config import settings
+    from engine import MonitorEngine
     key_len = len(settings.gemini_api_key) if settings.gemini_api_key else 0
+    
+    # Initialize model directly here to avoid bot_data issues
+    ai_model = None
+    if settings.gemini_api_key:
+        import google.generativeai as genai
+        genai.configure(api_key=settings.gemini_api_key)
+        ai_model = genai.GenerativeModel(
+            model_name=settings.gemini_model,
+            tools='google_search_retrieval'
+        )
+        
     engine = MonitorEngine(db, ai_model=ai_model)
     try:
         report = await engine.build_report(p, 'intraday')
