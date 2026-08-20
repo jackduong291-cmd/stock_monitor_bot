@@ -7,6 +7,7 @@ def register_handlers(app, db):
     app.add_handler(CommandHandler('start', start))
     app.add_handler(CommandHandler('list', positions))
     app.add_handler(CommandHandler('add', add_position_menu))
+    app.add_handler(CommandHandler('test_report', test_report))
     
     # Handler cho các nút bấm tác vụ danh mục (pause, close)
     app.add_handler(CallbackQueryHandler(callback, pattern=r'^(list|follow|pause|close):?\d*$'))
@@ -29,6 +30,25 @@ async def add_position_menu(update, context):
         'Bấm vào đây để điền thông tin vị thế mới:',
         reply_markup=InlineKeyboardMarkup(kb)
     )
+
+async def test_report(update, context):
+    await update.message.reply_text("🔄 Đang tạo báo cáo thử nghiệm, vui lòng đợi 5-10 giây...")
+    db = context.application.bot_data['db']
+    ai_model = context.application.bot_data.get('model')
+    
+    rows = db.tracked(update.effective_user.id)
+    if not rows:
+        await update.message.reply_text("❌ Bạn chưa có vị thế nào đang theo dõi để test.")
+        return
+        
+    p = rows[0] # Test the first one
+    from engine import MonitorEngine
+    engine = MonitorEngine(db, ai_model=ai_model)
+    try:
+        report = await engine.build_report(p, 'intraday')
+        await update.message.reply_text(report, parse_mode='HTML')
+    except Exception as e:
+        await update.message.reply_text(f"⚠️ Lỗi: {str(e)}")
 
 async def positions(update, context):
     db = context.application.bot_data['db']

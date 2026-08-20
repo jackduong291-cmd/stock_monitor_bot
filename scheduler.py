@@ -23,18 +23,21 @@ def start_scheduler(app, db, ai_model=None):
     scheduler = AsyncIOScheduler(timezone=ZoneInfo(settings.timezone))
     
     # 08:45 - Trước phiên sáng
-    scheduler.add_job(lambda: run_report('intraday'),
-        CronTrigger(hour=8, minute=45, day_of_week='mon-fri', timezone=ZoneInfo(settings.timezone)),
+    scheduler.add_job(run_report,
+        args=['intraday'],
+        trigger=CronTrigger(hour=8, minute=45, day_of_week='mon-fri', timezone=ZoneInfo(settings.timezone)),
         id='morning_report', replace_existing=True)
         
     # 12:45 - Trước phiên chiều
-    scheduler.add_job(lambda: run_report('intraday'),
-        CronTrigger(hour=12, minute=45, day_of_week='mon-fri', timezone=ZoneInfo(settings.timezone)),
+    scheduler.add_job(run_report,
+        args=['intraday'],
+        trigger=CronTrigger(hour=12, minute=45, day_of_week='mon-fri', timezone=ZoneInfo(settings.timezone)),
         id='afternoon_report', replace_existing=True)
         
     # 15:15 - Sau khi đóng cửa
-    scheduler.add_job(lambda: run_report('end_of_day'),
-        CronTrigger(hour=15, minute=15, day_of_week='mon-fri', timezone=ZoneInfo(settings.timezone)),
+    scheduler.add_job(run_report,
+        args=['end_of_day'],
+        trigger=CronTrigger(hour=15, minute=15, day_of_week='mon-fri', timezone=ZoneInfo(settings.timezone)),
         id='eod_report', replace_existing=True)
         
     scheduler.start()

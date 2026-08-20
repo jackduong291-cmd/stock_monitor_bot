@@ -84,6 +84,7 @@ async def main():
     db = Database(settings.db_path)
     
     async def post_init(application):
+        application.bot_data['model'] = model
         start_scheduler(application, db, model)
         from telegram import BotCommand, MenuButtonWebApp, WebAppInfo
         
