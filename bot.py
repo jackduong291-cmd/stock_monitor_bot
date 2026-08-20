@@ -43,10 +43,13 @@ async def test_report(update, context):
         
     p = rows[0] # Test the first one
     from engine import MonitorEngine
+    from config import settings
+    key_len = len(settings.gemini_api_key) if settings.gemini_api_key else 0
     engine = MonitorEngine(db, ai_model=ai_model)
     try:
         report = await engine.build_report(p, 'intraday')
-        await update.message.reply_text(report, parse_mode='HTML')
+        debug_msg = f"Debug: Key length = {key_len}, Model loaded = {ai_model is not None}\n\n"
+        await update.message.reply_text(debug_msg + report, parse_mode='HTML')
     except Exception as e:
         await update.message.reply_text(f"⚠️ Lỗi: {str(e)}")
 
