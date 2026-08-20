@@ -5,9 +5,9 @@ from config import settings
 from engine import MonitorEngine
 
 
-def start_scheduler(app, db, ai_model=None):
+def start_scheduler(app, db):
     async def run_report(report_type):
-        engine = MonitorEngine(db, ai_model=ai_model)
+        engine = MonitorEngine(db)
         tracked_positions = db.tracked()
         if not tracked_positions:
             return # Silent if no active positions

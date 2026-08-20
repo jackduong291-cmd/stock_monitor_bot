@@ -72,20 +72,10 @@ async def main():
     if not settings.telegram_bot_token:
         raise RuntimeError('Missing TELEGRAM_BOT_TOKEN')
     
-    if settings.gemini_api_key:
-        genai.configure(api_key=settings.gemini_api_key)
-        model = genai.GenerativeModel(
-            model_name=settings.gemini_model,
-            tools='google_search_retrieval'
-        )
-    else:
-        model = None
-
     db = Database(settings.db_path)
     
     async def post_init(application):
-        application.bot_data['model'] = model
-        start_scheduler(application, db, model)
+        start_scheduler(application, db)
         from telegram import BotCommand, MenuButtonWebApp, WebAppInfo
         
         # RENDER_EXTERNAL_URL is provided by Render, e.g., https://stock-monitor.onrender.com

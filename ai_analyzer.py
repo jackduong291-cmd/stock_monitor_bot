@@ -1,9 +1,21 @@
 import json
 from models import Position, MarketSnapshot
 
-async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, report_type: str, model=None):
-    if model is None:
-        return '⚠️ Chưa cấu hình AI provider. Hãy điền GEMINI_API_KEY trong file .env.'
+import google.generativeai as genai
+from config import settings
+
+# Khởi tạo AI Model toàn cục
+ai_model = None
+if settings.gemini_api_key:
+    genai.configure(api_key=settings.gemini_api_key)
+    ai_model = genai.GenerativeModel(
+        model_name=settings.gemini_model,
+        tools='google_search_retrieval'
+    )
+
+async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, report_type: str):
+    if ai_model is None:
+        return '⚠️ Chưa cấu hình AI provider. Hãy điền GEMINI_API_KEY trong mục Environment Variables.'
 
     payload = {
         'position': position.__dict__,
