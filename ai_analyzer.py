@@ -1,20 +1,16 @@
 import json
 from models import Position, MarketSnapshot
-
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from config import settings
 
-# Khởi tạo AI Model toàn cục
-ai_model = None
+# Khởi tạo AI Client toàn cục
+ai_client = None
 if settings.gemini_api_key:
-    genai.configure(api_key=settings.gemini_api_key)
-    ai_model = genai.GenerativeModel(
-        model_name=settings.gemini_model,
-        tools='google_search'
-    )
+    ai_client = genai.Client(api_key=settings.gemini_api_key)
 
 async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, report_type: str):
-    if ai_model is None:
+    if ai_client is None:
         return '⚠️ Chưa cấu hình AI provider. Hãy điền GEMINI_API_KEY trong mục Environment Variables.'
 
     payload = {
@@ -40,7 +36,13 @@ Sau khi quét tin tức, hãy thực hiện phân tích:
     prompt += '\n\nDỮ LIỆU ĐẦU VÀO:\n' + json.dumps(payload, ensure_ascii=False, default=str)
 
     try:
-        response = await model.generate_content_async(prompt)
+        response = await ai_client.aio.models.generate_content(
+            model=settings.gemini_model,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                tools=[{"google_search": {}}],
+            )
+        )
         return response.text
     except Exception as e:
         return f"⚠️ Lỗi khi gọi AI: {str(e)}"

@@ -6,7 +6,7 @@ pydantic>=2.7
 pandas>=2.2
 numpy>=1.26
 
-google-generativeai
+google-genai
 vnstock
 psycopg2-binary
 aiohttp
