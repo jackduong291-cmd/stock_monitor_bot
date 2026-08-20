@@ -20,18 +20,21 @@ async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, re
         'report_type': report_type
     }
     
-    prompt = f'''Bạn là chuyên gia chứng khoán VN. Nhiệm vụ của bạn là sử dụng công cụ Google Search để lấy tin tức mới nhất hôm nay về cổ phiếu {position.symbol} và tình hình vĩ mô, đặc biệt chú ý dòng tiền.
-Sau khi quét tin tức, hãy thực hiện phân tích (LƯU Ý: Rất ngắn gọn, súc tích, ĐÁP ÁN DƯỚI 500 TỪ):
+    prompt = f'''Bạn là chuyên gia chứng khoán VN. Nhiệm vụ của bạn là sử dụng công cụ Google Search để lấy tin tức mới nhất hôm nay về cổ phiếu {position.symbol}.
 '''
     if report_type == 'intraday':
         prompt += '''
-- Báo cáo TRONG PHIÊN: Hãy đánh giá giá Entry của người dùng có an toàn không dựa trên áp lực mua bán hiện tại và tin tức nóng vừa quét được. 
-- Kết luận ngắn gọn: HOLD / WATCH / REDUCE / EXIT.
+ĐÂY LÀ BÁO CÁO GIỮA PHIÊN. YÊU CẦU CỰC KỲ NGẮN GỌN (TỐI ĐA 3-4 CÂU, DƯỚI 50 TỪ).
+Chỉ trả lời 2 ý chính:
+1. Có tin tức gì bất thường/đột biến sáng nay không? (Nếu không có, nói "Không có tin xấu").
+2. Lời khuyên hành động (HOLD / WATCH / REDUCE / EXIT) so với giá Entry của người dùng.
 '''
     else:
         prompt += '''
-- Báo cáo CUỐI NGÀY: Tổng hợp tin tức cả ngày. Phân tích trạng thái đóng cửa để DỰ ĐOÁN XU HƯỚNG NGÀY MAI.
-- Nhận định xu hướng tiếp theo và đưa ra lời khuyên.
+ĐÂY LÀ BÁO CÁO CUỐI NGÀY. Yêu cầu phân tích chi tiết nhưng súc tích (DƯỚI 500 TỪ):
+1. Tổng hợp các tin tức quan trọng nhất trong ngày về doanh nghiệp này.
+2. Đánh giá sơ bộ tình hình vĩ mô và dòng tiền (như khối ngoại, thanh khoản).
+3. Nhận định xu hướng tiếp theo và đưa ra lời khuyên hành động cho người dùng đang giữ vị thế này.
 '''
     prompt += '\n\nDỮ LIỆU ĐẦU VÀO:\n' + json.dumps(payload, ensure_ascii=False, default=str)
 
