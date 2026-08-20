@@ -2,7 +2,6 @@ import os
 import asyncio
 from aiohttp import web
 from telegram.ext import Application
-import google.generativeai as genai
 from config import settings
 from db import Database
 from bot import register_handlers
