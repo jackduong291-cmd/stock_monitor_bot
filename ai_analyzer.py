@@ -10,7 +10,7 @@ if settings.gemini_api_key:
     genai.configure(api_key=settings.gemini_api_key)
     ai_model = genai.GenerativeModel(
         model_name=settings.gemini_model,
-        tools='google_search_retrieval'
+        tools='google_search'
     )
 
 async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, report_type: str):

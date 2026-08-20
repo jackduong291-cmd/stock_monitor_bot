@@ -44,12 +44,10 @@ async def test_report(update, context):
     p = rows[0] # Test the first one
     from config import settings
     from engine import MonitorEngine
-    key_len = len(settings.gemini_api_key) if settings.gemini_api_key else 0
     
     engine = MonitorEngine(db)
     try:
         report = await engine.build_report(p, 'intraday')
-        # Bỏ phần in debug đi cho báo cáo sạch sẽ
         await update.message.reply_text(report, parse_mode='HTML')
     except Exception as e:
         await update.message.reply_text(f"⚠️ Lỗi: {str(e)}")
