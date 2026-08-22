@@ -11,15 +11,8 @@ class MonitorEngine:
         snapshot = await self.market.snapshot(position.symbol)
         market_ctx = await self.market.market_context()
 
-        # Real value in VND
-        entry_val = position.entry_price * 1000 * position.quantity
-        current_val = snapshot.last_price * 1000 * position.quantity
-        
-        # Standard VN fees: 0.15% buy fee, 0.25% sell fee + tax. Total 0.4%
-        buy_fee = entry_val * 0.0015
-        sell_fee = current_val * 0.0025
-        
-        net_pnl = current_val - sell_fee - (entry_val + buy_fee)
+        # Tính Gross PNL (Không trừ phí)
+        net_pnl = (snapshot.last_price - position.entry_price) * position.quantity * 1000
         
         roi = (snapshot.last_price / position.entry_price - 1) * 100 if position.entry_price > 0 else 0
         ai_analysis = await analyze(position, snapshot, market_ctx, report_type)
