@@ -82,16 +82,13 @@ async def main():
         application.bot_data['webapp_url'] = webapp_url
         
         await application.bot.set_my_commands([
-            BotCommand("add", "Mở bảng Thêm vị thế"),
+            BotCommand("report", "Phân tích báo cáo chủ động"),
+            BotCommand("add", "Thêm vị thế (Mở Mini App)"),
             BotCommand("list", "Xem danh mục đang theo dõi")
         ])
         
-        await application.bot.set_chat_menu_button(
-            menu_button=MenuButtonWebApp(
-                text="Thêm vị thế",
-                web_app=WebAppInfo(url=webapp_url)
-            )
-        )
+        from telegram import MenuButtonDefault
+        await application.bot.set_chat_menu_button(menu_button=MenuButtonDefault())
         
     app = Application.builder().token(settings.telegram_bot_token).post_init(post_init).build()
     register_handlers(app, db)

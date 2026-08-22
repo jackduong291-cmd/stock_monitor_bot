@@ -8,9 +8,10 @@ def register_handlers(app, db):
     app.add_handler(CommandHandler('list', positions))
     app.add_handler(CommandHandler('add', add_position_menu))
     app.add_handler(CommandHandler('test_report', test_report))
+    app.add_handler(CommandHandler('report', report_menu))
     
-    # Handler cho các nút bấm tác vụ danh mục (pause, close)
-    app.add_handler(CallbackQueryHandler(callback, pattern=r'^(list|follow|pause|close):?\d*$'))
+    # Handler cho các nút bấm tác vụ danh mục (pause, close, analyze)
+    app.add_handler(CallbackQueryHandler(callback, pattern=r'^(list|follow|pause|close|analyze):?\d*$'))
 
 async def start(update, context):
     webapp_url = context.application.bot_data.get('webapp_url', 'https://stock-monitor-bot-g9rm.onrender.com')
@@ -65,6 +66,29 @@ async def positions(update, context):
             f'📌 <b>{p.symbol}</b>\nSố lượng: {p.quantity:,}\nEntry: {p.entry_price:,.2f}\n🟢 Đang theo dõi',
             parse_mode='HTML', reply_markup=InlineKeyboardMarkup(kb))
 
+async def report_menu(update, context):
+    db = context.application.bot_data['db']
+    rows = db.tracked(update.effective_user.id)
+    if not rows:
+        await update.message.reply_text("❌ Bạn chưa có vị thế nào đang theo dõi. Hãy thêm vị thế trước.")
+        return
+        
+    kb = []
+    # Create buttons for each stock, 3 per row
+    row = []
+    for p in rows:
+        row.append(InlineKeyboardButton(f"[{p.symbol}]", callback_data=f'analyze:{p.id}'))
+        if len(row) == 3:
+            kb.append(row)
+            row = []
+    if row:
+        kb.append(row)
+        
+    await update.message.reply_text(
+        "Vui lòng chọn mã cổ phiếu bạn muốn phân tích:",
+        reply_markup=InlineKeyboardMarkup(kb)
+    )
+
 async def callback(update, context):
     q = update.callback_query
     await q.answer()
@@ -77,6 +101,18 @@ async def callback(update, context):
     if not p or p.user_id != update.effective_user.id:
         await q.message.reply_text('Không tìm thấy vị thế.')
         return
+        
+    if action == 'analyze':
+        await q.message.reply_text(f"🔄 Đang thu thập dữ liệu và phân tích mã {p.symbol}...")
+        from engine import MonitorEngine
+        engine = MonitorEngine(db)
+        try:
+            report = await engine.build_report(p, 'intraday')
+            await q.message.reply_text(report, parse_mode='HTML')
+        except Exception as e:
+            await q.message.reply_text(f"⚠️ Lỗi: {str(e)}")
+        return
+
     if action == 'follow':
         db.set_tracking(p.id, True)
         msg = f'🟢 Đã bắt đầu theo dõi {p.symbol}.'
