@@ -12,16 +12,34 @@ def register_handlers(app, db):
     
     # Handler cho các nút bấm tác vụ danh mục (pause, close, analyze)
     app.add_handler(CallbackQueryHandler(callback, pattern=r'^(list|follow|pause|close|analyze):?\d*$'))
+    
+    # Handler cho bàn phím ảo (Reply Keyboard)
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+
+from telegram import ReplyKeyboardMarkup, KeyboardButton
 
 async def start(update, context):
     webapp_url = context.application.bot_data.get('webapp_url', 'https://stock-monitor-bot-g9rm.onrender.com')
     from telegram import WebAppInfo
-    kb = [[InlineKeyboardButton('📝 Mở Bảng Điền Thông Tin', web_app=WebAppInfo(url=webapp_url))]]
+    
+    reply_kb = [
+        [KeyboardButton("📊 Phân tích báo cáo")],
+        [KeyboardButton("📝 Thêm vị thế", web_app=WebAppInfo(url=webapp_url)), KeyboardButton("📋 Xem danh mục")]
+    ]
+    
     await update.message.reply_text(
-        '📊 <b>Stock Monitor</b>\nChào mừng bạn! Hãy bấm vào nút bên dưới (hoặc nút Menu góc trái) để mở Bảng điền thông tin nhé.',
+        '📊 <b>Stock Monitor</b>\nChào mừng bạn! Dưới đây là bảng điều khiển nhanh của bạn:',
         parse_mode='HTML',
-        reply_markup=InlineKeyboardMarkup(kb)
+        reply_markup=ReplyKeyboardMarkup(reply_kb, resize_keyboard=True)
     )
+
+async def handle_text(update, context):
+    text = update.message.text
+    if text == "📊 Phân tích báo cáo":
+        await report_menu(update, context)
+    elif text == "📋 Xem danh mục":
+        await positions(update, context)
+    # Nút "Thêm vị thế" là loại WebAppInfo nên nó không gửi text, nó tự mở app.
 
 async def add_position_menu(update, context):
     webapp_url = context.application.bot_data.get('webapp_url', 'https://stock-monitor-bot-g9rm.onrender.com')
