@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+import pytz
 from models import Position, MarketSnapshot
 from google import genai
 from google.genai import types
@@ -13,6 +15,10 @@ async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, re
     if ai_client is None:
         return '⚠️ Chưa cấu hình AI provider. Hãy điền GEMINI_API_KEY trong mục Environment Variables.'
 
+    now = datetime.now(pytz.timezone('Asia/Ho_Chi_Minh'))
+    days = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"]
+    date_info = f"{days[now.weekday()]}, ngày {now.strftime('%d/%m/%Y')}"
+
     payload = {
         'position': position.__dict__,
         'snapshot': snapshot.__dict__,
@@ -21,6 +27,7 @@ async def analyze(position: Position, snapshot: MarketSnapshot, market: dict, re
     }
     
     prompt = f'''Bạn là chuyên gia chứng khoán VN. Nhiệm vụ của bạn là sử dụng công cụ Google Search để lấy tin tức mới nhất hôm nay về cổ phiếu {position.symbol}.
+Lưu ý: Hôm nay là {date_info}. Nếu hôm nay là ngày nghỉ (Thứ 7, Chủ nhật), thị trường đang đóng cửa, hãy hành văn theo hướng "điểm tin cuối tuần" thay vì dùng từ "sáng nay" hay "phiên hôm nay".
 '''
     if report_type == 'intraday':
         prompt += '''
