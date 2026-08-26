@@ -12,6 +12,9 @@ def register_handlers(app, db):
     
     # Handler cho các nút bấm tác vụ danh mục (pause, close, analyze)
     app.add_handler(CallbackQueryHandler(callback, pattern=r'^(list|follow|pause|close|analyze):?\d*$'))
+    
+    from telegram.ext import MessageHandler, filters
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 
@@ -25,7 +28,13 @@ async def start(update, context):
         reply_markup=InlineKeyboardMarkup(kb)
     )
 
-# (Removed handle_text since user wants to use the native Menu button)
+async def handle_text(update, context):
+    text = update.message.text
+    if text == "📊 Phân tích báo cáo":
+        await report_menu(update, context)
+    elif text == "📋 Xem danh mục":
+        await positions(update, context)
+    # Nút "Thêm vị thế" là loại WebAppInfo nên nó không gửi text, nó tự mở app.
 
 async def add_position_menu(update, context):
     webapp_url = context.application.bot_data.get('webapp_url', 'https://stock-monitor-bot-g9rm.onrender.com')
